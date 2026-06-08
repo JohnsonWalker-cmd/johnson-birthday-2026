@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { QUOTES } from '../utils';
+import { QUOTES } from '../../utils';
 
 const MotivationalTicker: React.FC = () => {
   const [index, setIndex] = useState(0);

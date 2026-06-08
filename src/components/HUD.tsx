@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { calculateLevel, calculateXP, NAME, TARGET_DATE } from '../utils';
+import { calculateLevel, calculateXP, NAME, TARGET_DATE } from '../../utils';
 import { Target, Zap, Heart, User, Crown } from 'lucide-react';
 
 interface HUDProps {

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { StarData, Coordinates } from '../types';
-import { generateId, AFFIRMATIONS, TARGET_DATE, INITIAL_STARS } from '../utils';
-import { Users, Radio, MessageSquare } from 'lucide-react';
+import { StarData, Coordinates } from '../../types';
+import { generateId, AFFIRMATIONS, TARGET_DATE, INITIAL_STARS } from '../../utils';
+import { Users, Radio, MessageSquare, Music2 } from 'lucide-react';
 import HUD from './HUD';
 import Star from './Star';
 import SolarSystem from './SolarSystem';
@@ -16,6 +16,7 @@ import BirthdayCelebration from './BirthdayCelebration';
 import LaunchSequence from './LaunchSequence';
 import CommsModal from './CommsModal';
 import CometsLayer from './CometsLayer';
+import SpotifyModal from './SpotifyModal';
 
 type BirthdayPhase = 'countdown' | 'launch' | 'celebration';
 
@@ -28,6 +29,7 @@ const GalaxyDashboard: React.FC = () => {
   // Modal State
   const [alliesOpen, setAlliesOpen] = useState(false);
   const [commsOpen, setCommsOpen] = useState(false);
+  const [spotifyOpen, setSpotifyOpen] = useState(false);
   
   // Affirmation State
   const [affirmationOpen, setAffirmationOpen] = useState(false);
@@ -116,12 +118,17 @@ const GalaxyDashboard: React.FC = () => {
 
   const toggleAllies = () => {
     setAlliesOpen(!alliesOpen);
-    if (!alliesOpen) setCommsOpen(false);
+    if (!alliesOpen) { setCommsOpen(false); setSpotifyOpen(false); }
   };
 
   const toggleComms = () => {
     setCommsOpen(!commsOpen);
-    if (!commsOpen) setAlliesOpen(false);
+    if (!commsOpen) { setAlliesOpen(false); setSpotifyOpen(false); }
+  };
+
+  const toggleSpotify = () => {
+    setSpotifyOpen(!spotifyOpen);
+    if (!spotifyOpen) { setAlliesOpen(false); setCommsOpen(false); }
   };
 
   // Derived state for passing to HUD
@@ -187,6 +194,15 @@ const GalaxyDashboard: React.FC = () => {
           <MessageSquare size={16} />
           <span className="hidden md:inline">Comms</span>
         </button>
+
+        {/* Spotify Button */}
+        <button
+          onClick={toggleSpotify}
+          className="flex items-center gap-2 px-3 py-2 md:px-4 bg-[#1DB954]/10 border border-[#1DB954]/30 text-[#1DB954] font-mono text-xs md:text-sm uppercase tracking-widest hover:bg-[#1DB954]/20 hover:border-[#1DB954]/60 transition-all rounded backdrop-blur-sm"
+        >
+          <Music2 size={16} />
+          <span className="hidden md:inline">Sounds</span>
+        </button>
       </div>
 
       {/* Receive Signal Button */}
@@ -237,6 +253,11 @@ const GalaxyDashboard: React.FC = () => {
         isOpen={affirmationOpen}
         onClose={() => setAffirmationOpen(false)}
         message={currentAffirmation}
+      />
+
+      <SpotifyModal
+        isOpen={spotifyOpen}
+        onClose={() => setSpotifyOpen(false)}
       />
 
       {/* Guidance Text for Empty State */}

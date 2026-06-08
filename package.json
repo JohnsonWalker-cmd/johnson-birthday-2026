@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.108.0",
     "canvas-confetti": "^1.9.2",
     "framer-motion": "^11.0.8",
     "lucide-react": "*",
@@ -19,8 +20,10 @@
     "@types/canvas-confetti": "^1.6.4",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
-    "@vitejs/plugin-react": "^4.2.1",
+    "@vitejs/plugin-react": "^6.0.2",
+    "@vitejs/plugin-react-oxc": "^0.4.3",
+    "react-refresh": "^0.18.0",
     "typescript": "^5.2.2",
-    "vite": "^5.1.4"
+    "vite": "^8.0.16"
   }
 }

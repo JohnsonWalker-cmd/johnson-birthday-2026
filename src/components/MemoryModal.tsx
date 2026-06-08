@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Coordinates } from '../types';
+import { Coordinates } from '../../types';
 import { X, Sparkles } from 'lucide-react';
 
 interface MemoryModalProps {

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 // @ts-ignore
 import confetti from 'canvas-confetti';
-import { NAME } from '../utils';
+import { NAME } from '../../utils';
 import { Heart } from 'lucide-react';
 
 const BirthdayCelebration: React.FC = () => {

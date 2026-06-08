@@ -7,13 +7,13 @@
     <meta name="theme-color" content="#050505" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    
+
     <title>The Constellation of You</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Space+Grotesk:wght@300;400;500;700&family=Cinzel:wght@700&display=swap" rel="stylesheet">
-    
+
     <!-- Simple Green Dot Favicon -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2250%22 fill=%22%234ade80%22/></svg>">
 
@@ -23,20 +23,17 @@
         overflow: hidden;
         background-color: #050505;
         font-family: 'Courier Prime', monospace;
-        overscroll-behavior: none; /* Prevent scroll bounce on Mac/iOS */
-        user-select: none; /* Prevent text selection for app-like feel */
+        overscroll-behavior: none;
+        user-select: none;
         -webkit-user-select: none;
       }
-      /* Allow text selection in inputs and textareas */
       input, textarea {
         user-select: text;
         -webkit-user-select: text;
       }
-      /* Custom font utility */
       .font-cinzel {
         font-family: 'Cinzel', serif;
       }
-      /* Custom scrollbar for memory lists if needed */
       ::-webkit-scrollbar {
         width: 8px;
       }
@@ -51,24 +48,9 @@
         background: #555;
       }
     </style>
-  <script type="importmap">
-{
-  "imports": {
-    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.555.0",
-    "framer-motion": "https://aistudiocdn.com/framer-motion@^12.23.25",
-    "vite": "https://aistudiocdn.com/vite@^7.2.6",
-    "@vitejs/plugin-react": "https://aistudiocdn.com/@vitejs/plugin-react@^5.1.1",
-    "react/": "https://aistudiocdn.com/react@^19.2.0/",
-    "react": "https://aistudiocdn.com/react@^19.2.0",
-    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
-    "canvas-confetti": "https://aistudiocdn.com/canvas-confetti@^1.9.4"
-  }
-}
-</script>
-<link rel="stylesheet" href="/index.css">
-</head>
+  </head>
   <body>
     <div id="root"></div>
-    <script type="module" src="/index.tsx"></script>
+    <script type="module" src="/src/index.tsx"></script>
   </body>
 </html>

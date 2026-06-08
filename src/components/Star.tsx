@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { StarData } from '../types';
+import { StarData } from '../../types';
 
 interface StarProps {
   data: StarData;

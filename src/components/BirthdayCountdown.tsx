@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { TARGET_DATE } from '../utils';
+import { TARGET_DATE } from '../../utils';
 import { Timer } from 'lucide-react';
 
 const BirthdayCountdown: React.FC = () => {

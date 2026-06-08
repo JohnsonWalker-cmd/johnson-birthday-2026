@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Calendar, Trash2 } from 'lucide-react';
-import { StarData } from '../types';
+import { StarData } from '../../types';
 
 interface ViewMemoryModalProps {
   star: StarData | null;
