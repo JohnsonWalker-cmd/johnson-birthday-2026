@@ -131,20 +131,27 @@ const GalaxyDashboard: React.FC = () => {
 
   const handleIgnite = async (data: { memory: string; photo?: string; year?: number }) => {
     if (!pendingCoords) return;
-    setModalOpen(false);
-    setPendingCoords(null);
-    await supabase.from('stars').insert({
+    const newStar: StarData = {
       id: generateId(),
       x: pendingCoords.x,
       y: pendingCoords.y,
       memory: data.memory,
       timestamp: Date.now(),
-      photo: data.photo ?? null,
-      year: data.year ?? null,
+      photo: data.photo,
+      year: data.year,
+    };
+    setStars(prev => [...prev, newStar]);
+    setModalOpen(false);
+    setPendingCoords(null);
+    await supabase.from('stars').insert({
+      ...newStar,
+      photo: newStar.photo ?? null,
+      year: newStar.year ?? null,
     });
   };
 
   const handleDeleteStar = async (id: string) => {
+    setStars(prev => prev.filter(s => s.id !== id));
     await supabase.from('stars').delete().eq('id', id);
   };
 
@@ -221,6 +228,7 @@ const GalaxyDashboard: React.FC = () => {
       <div className="absolute top-6 right-6 md:top-10 md:right-10 z-30 flex gap-2 md:gap-3">
         {/* Allies Button */}
         <button
+          type="button"
           onClick={toggleAllies}
           className="flex items-center gap-2 px-3 py-2 md:px-4 bg-blue-900/20 border border-blue-500/30 text-blue-400 font-mono text-xs md:text-sm uppercase tracking-widest hover:bg-blue-900/40 hover:text-blue-300 hover:border-blue-500/60 transition-all rounded backdrop-blur-sm"
         >
@@ -230,6 +238,7 @@ const GalaxyDashboard: React.FC = () => {
 
         {/* Comms Button */}
         <button
+          type="button"
           onClick={toggleComms}
           className="flex items-center gap-2 px-3 py-2 md:px-4 bg-green-900/20 border border-green-500/30 text-green-400 font-mono text-xs md:text-sm uppercase tracking-widest hover:bg-green-900/40 hover:text-green-300 hover:border-green-500/60 transition-all rounded backdrop-blur-sm"
         >
@@ -239,6 +248,7 @@ const GalaxyDashboard: React.FC = () => {
 
         {/* Spotify Button */}
         <button
+          type="button"
           onClick={toggleSpotify}
           className="flex items-center gap-2 px-3 py-2 md:px-4 bg-[#1DB954]/10 border border-[#1DB954]/30 text-[#1DB954] font-mono text-xs md:text-sm uppercase tracking-widest hover:bg-[#1DB954]/20 hover:border-[#1DB954]/60 transition-all rounded backdrop-blur-sm"
         >
@@ -250,6 +260,7 @@ const GalaxyDashboard: React.FC = () => {
       {/* Receive Signal Button */}
       <div className="absolute bottom-24 md:bottom-16 right-6 md:right-10 z-30">
         <button
+           type="button"
            onClick={handleSignalClick}
            className="flex items-center gap-2 px-4 py-2 bg-yellow-900/20 border border-yellow-500/30 text-yellow-400 font-mono text-xs md:text-sm uppercase tracking-widest hover:bg-yellow-900/40 hover:text-yellow-300 hover:border-yellow-500/60 transition-all rounded backdrop-blur-sm group shadow-[0_0_15px_rgba(234,179,8,0.1)]"
         >
