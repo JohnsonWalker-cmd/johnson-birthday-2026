@@ -85,7 +85,10 @@ const MemoryModal: React.FC<MemoryModalProps> = ({ isOpen, position, onClose, on
             <div className="bg-[#0f0f0f] border border-green-500/30 rounded-lg p-6 shadow-[0_0_30px_rgba(74,222,128,0.1)] relative overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-green-500 to-transparent opacity-50" />
               <button
+                type="button"
                 onClick={onClose}
+                title="Close"
+                aria-label="Close"
                 className="absolute top-2 right-2 text-gray-500 hover:text-white transition-colors"
               >
                 <X size={16} />

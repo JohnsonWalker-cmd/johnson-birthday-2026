@@ -127,6 +127,8 @@ const CommsModal: React.FC<CommsModalProps> = ({ isOpen, onClose }) => {
               <button
                 type='button'
                 onClick={onClose}
+                aria-label="Close comms log"
+                title="Close comms log"
                 className="absolute top-6 right-6 text-green-500/50 hover:text-green-400 transition-colors"
               >
                 <X size={20} />
