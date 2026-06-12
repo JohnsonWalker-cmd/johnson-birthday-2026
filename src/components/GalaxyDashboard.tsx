@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { StarData, Coordinates } from '../../types';
-import { generateId, AFFIRMATIONS, TARGET_DATE, INITIAL_STARS } from '../../utils';
+import { generateId, AFFIRMATIONS, TARGET_DATE } from '../../utils';
+import { supabase, StarRow } from '../lib/supabase';
 import { Users, Radio, MessageSquare, Music2 } from 'lucide-react';
 import HUD from './HUD';
 import Star from './Star';
@@ -21,8 +22,7 @@ import SpotifyModal from './SpotifyModal';
 type BirthdayPhase = 'countdown' | 'launch' | 'celebration';
 
 const GalaxyDashboard: React.FC = () => {
-  // Initialize state from hardcoded defaults. No more local storage.
-  const [stars, setStars] = useState<StarData[]>(INITIAL_STARS);
+  const [stars, setStars] = useState<StarData[]>([]);
 
   const [modalOpen, setModalOpen] = useState(false);
   
@@ -63,6 +63,44 @@ const GalaxyDashboard: React.FC = () => {
     return () => clearInterval(timer);
   }, []);
 
+  // Fetch stars from Supabase and subscribe to real-time changes
+  useEffect(() => {
+    const rowToStar = (row: StarRow): StarData => ({
+      id: row.id,
+      x: row.x,
+      y: row.y,
+      memory: row.memory,
+      timestamp: row.timestamp,
+      photo: row.photo ?? undefined,
+      year: row.year ?? undefined,
+    });
+
+    supabase
+      .from('stars')
+      .select('*')
+      .order('created_at', { ascending: true })
+      .then(({ data }) => {
+        if (data) setStars((data as StarRow[]).map(rowToStar));
+      });
+
+    const channel = supabase
+      .channel('stars-live')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'stars' }, (payload) => {
+        const incoming = rowToStar(payload.new as StarRow);
+        setStars(prev => prev.some(s => s.id === incoming.id) ? prev : [...prev, incoming]);
+      })
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'stars' }, (payload) => {
+        const updated = rowToStar(payload.new as StarRow);
+        setStars(prev => prev.map(s => s.id === updated.id ? updated : s));
+      })
+      .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'stars' }, (payload) => {
+        setStars(prev => prev.filter(s => s.id !== (payload.old as StarRow).id));
+      })
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, []);
+
   const handleLaunchComplete = () => {
     setBirthdayPhase('celebration');
   };
@@ -91,23 +129,27 @@ const GalaxyDashboard: React.FC = () => {
     setModalOpen(true);
   };
 
-  const handleIgnite = (memory: string) => {
-    if (pendingCoords) {
-      const newStar: StarData = {
-        id: generateId(),
-        x: pendingCoords.x,
-        y: pendingCoords.y,
-        memory,
-        timestamp: Date.now(),
-      };
-      setStars([...stars, newStar]);
-      setModalOpen(false);
-      setPendingCoords(null);
-    }
+  const handleIgnite = async (data: { memory: string; photo?: string; year?: number }) => {
+    if (!pendingCoords) return;
+    setModalOpen(false);
+    setPendingCoords(null);
+    await supabase.from('stars').insert({
+      id: generateId(),
+      x: pendingCoords.x,
+      y: pendingCoords.y,
+      memory: data.memory,
+      timestamp: Date.now(),
+      photo: data.photo ?? null,
+      year: data.year ?? null,
+    });
   };
 
-  const handleDeleteStar = (id: string) => {
-    setStars(stars.filter(s => s.id !== id));
+  const handleDeleteStar = async (id: string) => {
+    await supabase.from('stars').delete().eq('id', id);
+  };
+
+  const handleUpdateStar = async (id: string, photo: string, year: number) => {
+    await supabase.from('stars').update({ photo, year }).eq('id', id);
   };
 
   const handleSignalClick = () => {
@@ -233,10 +275,11 @@ const GalaxyDashboard: React.FC = () => {
         onIgnite={handleIgnite}
       />
 
-      <ViewMemoryModal 
-        star={selectedStar} 
+      <ViewMemoryModal
+        star={selectedStar}
         onClose={() => setSelectedStar(null)}
         onDelete={handleDeleteStar}
+        onUpdate={handleUpdateStar}
       />
 
       <AlliesModal 

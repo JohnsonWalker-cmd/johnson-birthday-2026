@@ -11,3 +11,14 @@ export interface Wish {
   text: string;
   created_at: string;
 }
+
+export interface StarRow {
+  id: string;
+  x: number;
+  y: number;
+  memory: string;
+  timestamp: number;
+  photo: string | null;
+  year: number | null;
+  created_at: string;
+}

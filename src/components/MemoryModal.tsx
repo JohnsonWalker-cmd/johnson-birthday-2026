@@ -1,18 +1,21 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Coordinates } from '../../types';
-import { X, Sparkles } from 'lucide-react';
+import { X, Sparkles, ImagePlus, XCircle } from 'lucide-react';
 
 interface MemoryModalProps {
   isOpen: boolean;
   position: Coordinates | null;
   onClose: () => void;
-  onIgnite: (memory: string) => void;
+  onIgnite: (data: { memory: string; photo?: string; year?: number }) => void;
 }
 
 const MemoryModal: React.FC<MemoryModalProps> = ({ isOpen, position, onClose, onIgnite }) => {
   const [memory, setMemory] = useState('');
+  const [photo, setPhoto] = useState<string | undefined>(undefined);
+  const [year, setYear] = useState<number>(new Date().getFullYear());
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -27,23 +30,30 @@ const MemoryModal: React.FC<MemoryModalProps> = ({ isOpen, position, onClose, on
       setTimeout(() => inputRef.current?.focus(), 100);
     } else {
       setMemory('');
+      setPhoto(undefined);
+      setYear(new Date().getFullYear());
     }
   }, [isOpen]);
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      setPhoto(ev.target?.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (memory.trim()) {
-      onIgnite(memory);
+    if (memory.trim() && photo) {
+      onIgnite({ memory, photo, year });
     }
   };
 
-  // On mobile: Center the modal. On Desktop: Position relative to click (clamped to viewport)
   const modalStyle: React.CSSProperties = isMobile
-    ? {
-        left: '50%',
-        top: '50%',
-        transform: 'translate(-50%, -50%)',
-      }
+    ? { left: '50%', top: '50%', transform: 'translate(-50%, -50%)' }
     : position
     ? {
         left: Math.min(Math.max(position.x, 15), 85) + '%',
@@ -56,7 +66,6 @@ const MemoryModal: React.FC<MemoryModalProps> = ({ isOpen, position, onClose, on
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -64,20 +73,18 @@ const MemoryModal: React.FC<MemoryModalProps> = ({ isOpen, position, onClose, on
             onClick={onClose}
             className="fixed inset-0 bg-black/60 backdrop-blur-[2px] z-40"
           />
-          
+
           <motion.div
             className="fixed z-50 w-[90vw] max-w-sm"
             style={modalStyle}
             initial={{ scale: 0.8, opacity: 0, y: 20, x: isMobile ? '-50%' : '-50%' }}
             animate={{ scale: 1, opacity: 1, y: isMobile ? '-50%' : 0, x: isMobile ? '-50%' : '-50%' }}
             exit={{ scale: 0.8, opacity: 0, y: 20 }}
-            transition={{ type: "spring", stiffness: 300, damping: 25 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 25 }}
           >
             <div className="bg-[#0f0f0f] border border-green-500/30 rounded-lg p-6 shadow-[0_0_30px_rgba(74,222,128,0.1)] relative overflow-hidden">
-              
-              {/* Decorative headers */}
               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-green-500 to-transparent opacity-50" />
-              <button 
+              <button
                 onClick={onClose}
                 className="absolute top-2 right-2 text-gray-500 hover:text-white transition-colors"
               >
@@ -99,10 +106,10 @@ const MemoryModal: React.FC<MemoryModalProps> = ({ isOpen, position, onClose, on
                     className="w-full bg-[#050505] text-white border border-gray-800 rounded p-3 text-sm font-mono focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500 transition-all resize-none h-24 placeholder-gray-600"
                     maxLength={140}
                     onKeyDown={(e) => {
-                        if (e.key === 'Enter' && !e.shiftKey) {
-                            e.preventDefault();
-                            handleSubmit(e);
-                        }
+                      if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        handleSubmit(e);
+                      }
                     }}
                   />
                   <div className="text-right text-[10px] text-gray-600 mt-1 font-mono">
@@ -110,9 +117,56 @@ const MemoryModal: React.FC<MemoryModalProps> = ({ isOpen, position, onClose, on
                   </div>
                 </div>
 
+                {/* Photo upload */}
+                <div className="flex flex-col gap-2">
+                  {photo ? (
+                    <div className="relative rounded overflow-hidden border border-green-500/20">
+                      <img src={photo} alt="memory" className="w-full h-32 object-cover" />
+                      <button
+                        type="button"
+                        title="Remove photo"
+                        onClick={() => { setPhoto(undefined); if (fileRef.current) fileRef.current.value = ''; }}
+                        className="absolute top-1 right-1 text-white/70 hover:text-white bg-black/60 rounded-full p-0.5"
+                      >
+                        <XCircle size={16} />
+                      </button>
+                      {/* Year input shown when photo is attached */}
+                      <div className="absolute bottom-0 left-0 right-0 bg-black/70 px-3 py-1.5 flex items-center gap-2">
+                        <span className="text-gray-400 font-mono text-xs">Year taken:</span>
+                        <input
+                          type="number"
+                          title="Year photo was taken"
+                          value={year}
+                          onChange={(e) => setYear(Number(e.target.value))}
+                          min={1990}
+                          max={new Date().getFullYear()}
+                          className="w-20 bg-transparent border-b border-green-500/40 text-green-300 font-mono text-xs text-center focus:outline-none focus:border-green-400"
+                        />
+                      </div>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => fileRef.current?.click()}
+                      className="flex items-center justify-center gap-2 w-full py-2 border border-dashed border-green-700/60 rounded text-green-600 hover:text-green-400 hover:border-green-500 font-mono text-xs uppercase tracking-widest transition-all"
+                    >
+                      <ImagePlus size={14} />
+                      Attach a photo — required
+                    </button>
+                  )}
+                  <input
+                    ref={fileRef}
+                    type="file"
+                    accept="image/*"
+                    title="Upload a photo for this memory"
+                    className="hidden"
+                    onChange={handleFileChange}
+                  />
+                </div>
+
                 <button
                   type="submit"
-                  disabled={!memory.trim()}
+                  disabled={!memory.trim() || !photo}
                   className="bg-green-600/20 hover:bg-green-600/30 text-green-400 hover:text-green-300 border border-green-600/50 py-2 rounded font-mono text-sm uppercase tracking-widest transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 group"
                 >
                   <span>Ignite Star</span>
